@@ -1,0 +1,258 @@
+# File: index.html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CX Ounass</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <div class="sidebar">
+            <div class="brand">CX Ounass</div>
+            
+            <div class="nav-item">
+                <span class="nav-icon">🏠</span>
+                Dashboard
+            </div>
+
+            <div class="nav-item">
+                <span class="nav-icon">⏱️</span>
+                Activities
+            </div>
+
+            <div class="nav-item">
+                <span class="nav-icon">📊</span>
+                Analytics
+            </div>
+
+            <div class="nav-item" data-toggle="case-overview">
+                <span class="nav-icon">📁</span>
+                Case Overview
+                <span class="chevron">▼</span>
+            </div>
+            <div class="sub-nav" id="case-overview">
+                <div class="nav-item">Assigned</div>
+                <div class="nav-item">Unassigned</div>
+                <div class="nav-item">Other Qs</div>
+                <div class="nav-item">My Open Cases</div>
+                <div class="nav-item">High Priority</div>
+                <div class="nav-item">Duplicates</div>
+            </div>
+
+            <div class="nav-item" data-toggle="qc-failure">
+                <span class="nav-icon">❌</span>
+                QC Failure
+                <span class="chevron">▼</span>
+            </div>
+            <div class="sub-nav" id="qc-failure">
+                <div class="nav-item">Order Number Cleaner</div>
+                <div class="nav-item">Case Number Cleaner</div>
+                <div class="nav-item">Salesforce Query</div>
+                <div class="nav-item">Combined ID</div>
+                <div class="nav-item">QC Failure Cases</div>
+            </div>
+
+            <div class="nav-item">
+                <span class="nav-icon">👥</span>
+                Champs
+            </div>
+
+            <div class="nav-item">
+                <span class="nav-icon">👤</span>
+                User Management
+            </div>
+
+            <div class="nav-item">
+                <span class="nav-icon">⚙️</span>
+                Settings
+            </div>
+        </div>
+        
+        <div class="main-content">
+            <div class="header-actions">
+                <button class="profile-button">A</button>
+            </div>
+
+            <div class="welcome-card">
+                <h1>Welcome to Dashboard</h1>
+                <p>Select an option from the sidebar to get started.</p>
+            </div>
+        </div>
+    </div>
+    <script src="script.js"></script>
+</body>
+</html>
+
+# File: styles.css
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: Arial, sans-serif;
+}
+
+body {
+    background: #f5f6f7;
+}
+
+.container {
+    display: flex;
+    min-height: 100vh;
+}
+
+.sidebar {
+    width: 250px;
+    background: #1a1f2c;
+    color: #8b8fa3;
+    padding: 20px 0;
+    height: 100vh;
+    overflow-y: auto;
+}
+
+.brand {
+    color: white;
+    padding: 20px;
+    font-size: 20px;
+    font-weight: bold;
+    margin-bottom: 20px;
+}
+
+.main-content {
+    flex: 1;
+    padding: 30px;
+    background: #f5f6f7;
+}
+
+.nav-item {
+    padding: 12px 20px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    color: #8b8fa3;
+    transition: all 0.3s;
+}
+
+.nav-item:hover {
+    background: #2a2f3c;
+    color: white;
+}
+
+.nav-item.active {
+    background: #2a2f3c;
+    color: white;
+}
+
+.sub-nav {
+    padding-left: 20px;
+    display: none;
+    background: rgba(0,0,0,0.1);
+}
+
+.sub-nav.open {
+    display: block;
+}
+
+.sub-nav .nav-item {
+    padding: 8px 20px;
+    font-size: 14px;
+}
+
+.welcome-card {
+    background: white;
+    padding: 30px;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+}
+
+.welcome-card h1 {
+    font-size: 24px;
+    margin-bottom: 10px;
+    color: #1a1f2c;
+}
+
+.welcome-card p {
+    color: #666;
+}
+
+.nav-icon {
+    width: 20px;
+    text-align: center;
+    opacity: 0.7;
+}
+
+.header-actions {
+    position: absolute;
+    top: 20px;
+    right: 30px;
+}
+
+.profile-button {
+    background: #e2e4e8;
+    border: none;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    font-weight: bold;
+    color: #1a1f2c;
+}
+
+.chevron {
+    margin-left: auto;
+    font-size: 12px;
+    opacity: 0.7;
+}
+
+# File: script.js
+// Handle sub-navigation toggling
+document.querySelectorAll('[data-toggle]').forEach(item => {
+    item.addEventListener('click', () => {
+        const targetId = item.getAttribute('data-toggle');
+        const subNav = document.getElementById(targetId);
+        
+        // Close all other sub-navs
+        document.querySelectorAll('.sub-nav').forEach(nav => {
+            if (nav.id !== targetId) {
+                nav.classList.remove('open');
+                const parentItem = document.querySelector(`[data-toggle="${nav.id}"]`);
+                if (parentItem) {
+                    parentItem.querySelector('.chevron').textContent = '▶';
+                }
+            }
+        });
+        
+        // Toggle current sub-nav
+        subNav.classList.toggle('open');
+        
+        // Toggle chevron direction
+        const chevron = item.querySelector('.chevron');
+        chevron.textContent = subNav.classList.contains('open') ? '▼' : '▶';
+    });
+});
+
+// Handle navigation item active state
+document.querySelectorAll('.nav-item').forEach(item => {
+    item.addEventListener('click', (e) => {
+        // Only set active if clicking the item itself, not its children
+        if (e.currentTarget === item) {
+            // Remove active class from all items
+            document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
+            // Add active class to clicked item
+            item.classList.add('active');
+        }
+    });
+});
+
+// Initialize with Case Overview open
+document.querySelector('[data-toggle="case-overview"]').click();
+
+# File: netlify.toml
+[build]
+  publish = "."
+  command = ""

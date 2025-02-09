@@ -1,286 +1,80 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { BrowserRouter as Router, Route, Routes, Navigate, Link } from 'react-router-dom';
 import { 
-  BarChart, 
+  LayoutDashboard, 
+  Users, 
+  FileText, 
+  Shield, 
+  LogOut, 
+  Home, 
   User, 
   Settings, 
-  LogOut, 
-  Bell, 
-  Search,
-  Home,
-  Briefcase,
-  Users,
-  AlertCircle
+  AlertCircle 
 } from 'lucide-react';
 
-// Layout Components
-const DashboardLayout = ({ children }) => {
-  const [sidebarOpen, setSidebarOpen] = useState(false);
-  const [searchQuery, setSearchQuery] = useState('');
-  const [notifications] = useState([
-    { id: 1, message: 'New case assigned', time: '5m ago' },
-    { id: 2, message: 'Meeting in 15 minutes', time: '15m ago' },
-    { id: 3, message: 'Report due today', time: '1h ago' }
-  ]);
-
-  const navItems = [
-    { icon: Home, label: 'Dashboard', path: '/' },
-    { icon: Briefcase, label: 'Cases', path: '/cases' },
-    { icon: Users, label: 'Champions', path: '/champions' },
-    { icon: Settings, label: 'Settings', path: '/settings' }
-  ];
-
-  return (
-    <div className="flex h-screen bg-gray-100">
-      {/* Sidebar */}
-      <div className={`fixed inset-y-0 left-0 z-50 w-64 bg-gray-900 transform ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'} md:relative md:translate-x-0 transition duration-200 ease-in-out`}>
-        <div className="flex flex-col h-full">
-          <div className="flex items-center justify-between p-4 border-b border-gray-800">
-            <span className="text-xl font-bold text-white">Bolt Dashboard</span>
-            <button 
-              onClick={() => setSidebarOpen(false)}
-              className="md:hidden text-gray-500 hover:text-gray-400"
-            >
-              <span className="sr-only">Close sidebar</span>
-              <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-              </svg>
-            </button>
-          </div>
-          <nav className="flex-1 px-2 py-4 space-y-1">
-            {navItems.map((item) => (
-              <a
-                key={item.label}
-                href={item.path}
-                className="flex items-center px-4 py-2 text-gray-300 hover:bg-gray-800 rounded-lg"
-              >
-                <item.icon className="h-5 w-5 mr-3" />
-                {item.label}
-              </a>
-            ))}
-          </nav>
-          <div className="p-4 border-t border-gray-800">
-            <button className="flex items-center w-full px-4 py-2 text-gray-300 hover:bg-gray-800 rounded-lg">
-              <LogOut className="h-5 w-5 mr-3" />
-              Logout
-            </button>
-          </div>
-        </div>
-      </div>
-
-      {/* Main Content */}
-      <div className="flex-1 flex flex-col overflow-hidden">
-        {/* Header */}
-        <header className="bg-white shadow-sm">
-          <div className="flex items-center justify-between p-4">
-            <button
-              onClick={() => setSidebarOpen(true)}
-              className="md:hidden text-gray-500 hover:text-gray-600"
-            >
-              <span className="sr-only">Open sidebar</span>
-              <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
-              </svg>
-            </button>
-            
-            <div className="flex-1 px-4 flex justify-between">
-              <div className="flex-1 flex">
-                <div className="w-full max-w-lg lg:max-w-xs">
-                  <label htmlFor="search" className="sr-only">Search</label>
-                  <div className="relative">
-                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                      <Search className="h-5 w-5 text-gray-400" />
-                    </div>
-                    <input
-                      id="search"
-                      className="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md leading-5 bg-white placeholder-gray-500 focus:outline-none focus:placeholder-gray-400 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 sm:text-sm"
-                      placeholder="Search"
-                      type="search"
-                      value={searchQuery}
-                      onChange={(e) => setSearchQuery(e.target.value)}
-                    />
-                  </div>
-                </div>
-              </div>
-              
-              <div className="flex items-center">
-                {/* Notifications */}
-                <div className="relative">
-                  <button className="p-2 text-gray-400 hover:text-gray-500">
-                    <Bell className="h-6 w-6" />
-                    <span className="absolute top-0 right-0 block h-2 w-2 rounded-full bg-red-500"></span>
-                  </button>
-                </div>
-                
-                {/* Profile dropdown */}
-                <div className="ml-3 relative">
-                  <button className="flex items-center max-w-xs text-sm rounded-full focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
-                    <img
-                      className="h-8 w-8 rounded-full"
-                      src="/api/placeholder/32/32"
-                      alt="User avatar"
-                    />
-                  </button>
-                </div>
-              </div>
-            </div>
-          </div>
-        </header>
-
-        {/* Main content */}
-        <main className="flex-1 overflow-y-auto bg-gray-100 p-6">
-          {children}
-        </main>
-      </div>
-    </div>
-  );
-};
-
-// Stats Card Component
-const StatsCard = ({ title, value, icon: Icon, trend }) => (
-  <div className="bg-white rounded-lg shadow p-6">
-    <div className="flex items-center justify-between">
-      <div>
-        <p className="text-sm font-medium text-gray-600">{title}</p>
-        <p className="text-2xl font-semibold text-gray-900">{value}</p>
-      </div>
-      <div className={`p-3 rounded-full ${trend > 0 ? 'bg-green-100' : 'bg-red-100'}`}>
-        <Icon className={`h-6 w-6 ${trend > 0 ? 'text-green-600' : 'text-red-600'}`} />
-      </div>
-    </div>
-    <div className="mt-4">
-      <span className={`text-sm ${trend > 0 ? 'text-green-600' : 'text-red-600'}`}>
-        {trend > 0 ? '+' : ''}{trend}%
-      </span>
-      <span className="text-sm text-gray-600 ml-2">from last month</span>
-    </div>
-  </div>
-);
-
-// Dashboard Component
-const Dashboard = () => {
-  const stats = [
-    { title: 'Total Cases', value: '256', icon: Briefcase, trend: 12 },
-    { title: 'Active Champions', value: '32', icon: Users, trend: 8 },
-    { title: 'Open Issues', value: '15', icon: AlertCircle, trend: -5 },
-    { title: 'Resolution Rate', value: '94%', icon: BarChart, trend: 2 }
-  ];
-
-  const recentActivity = [
-    { id: 1, user: 'John Doe', action: 'Created new case', time: '2 hours ago' },
-    { id: 2, user: 'Jane Smith', action: 'Updated case #123', time: '4 hours ago' },
-    { id: 3, user: 'Mike Johnson', action: 'Resolved case #456', time: '1 day ago' },
-    { id: 4, user: 'Sarah Wilson', action: 'Added new champion', time: '2 days ago' }
-  ];
-
-  return (
-    <div className="space-y-6">
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        {stats.map((stat) => (
-          <StatsCard key={stat.title} {...stat} />
-        ))}
-      </div>
-
-      <div className="bg-white rounded-lg shadow">
-        <div className="px-6 py-4 border-b border-gray-200">
-          <h3 className="text-lg font-medium text-gray-900">Recent Activity</h3>
-        </div>
-        <div className="divide-y divide-gray-200">
-          {recentActivity.map((activity) => (
-            <div key={activity.id} className="px-6 py-4">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm font-medium text-gray-900">{activity.user}</p>
-                  <p className="text-sm text-gray-600">{activity.action}</p>
-                </div>
-                <p className="text-sm text-gray-500">{activity.time}</p>
-              </div>
-            </div>
-          ))}
-        </div>
-      </div>
-    </div>
-  );
-};
+// Tailwind CSS Import
+import './index.css';
 
 // Login Component
-const Login = () => {
-  const [formData, setFormData] = useState({
-    email: '',
-    password: ''
-  });
+const Login = ({ onLogin }) => {
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
   const [error, setError] = useState('');
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    // Add your authentication logic here
-    console.log('Login attempt:', formData);
-  };
-
-  const handleChange = (e) => {
-    setFormData({
-      ...formData,
-      [e.target.name]: e.target.value
-    });
+    
+    // Hardcoded credentials for demo
+    if (email === 'demo@example.com' && password === 'Demo123!') {
+      localStorage.setItem('isAuthenticated', 'true');
+      onLogin();
+    } else {
+      setError('Invalid email or password');
+    }
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-100 py-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-md w-full space-y-8">
-        <div>
-          <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
-            Sign in to your account
-          </h2>
-        </div>
-        <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
-          {error && (
-            <div className="rounded-md bg-red-50 p-4">
-              <div className="flex">
-                <div className="flex-shrink-0">
-                  <AlertCircle className="h-5 w-5 text-red-400" />
-                </div>
-                <div className="ml-3">
-                  <p className="text-sm font-medium text-red-800">{error}</p>
-                </div>
-              </div>
-            </div>
-          )}
-          <div className="rounded-md shadow-sm -space-y-px">
-            <div>
-              <label htmlFor="email" className="sr-only">Email address</label>
-              <input
-                id="email"
-                name="email"
-                type="email"
-                required
-                className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-t-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm"
-                placeholder="Email address"
-                value={formData.email}
-                onChange={handleChange}
-              />
-            </div>
-            <div>
-              <label htmlFor="password" className="sr-only">Password</label>
-              <input
-                id="password"
-                name="password"
-                type="password"
-                required
-                className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-b-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm"
-                placeholder="Password"
-                value={formData.password}
-                onChange={handleChange}
-              />
-            </div>
+    <div className="min-h-screen flex items-center justify-center bg-gray-100">
+      <div className="bg-white p-8 rounded-xl shadow-md w-96">
+        <h2 className="text-2xl font-bold mb-6 text-center">Login to Bolt Dashboard</h2>
+        {error && (
+          <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-4" role="alert">
+            {error}
           </div>
-
-          <div>
-            <button
-              type="submit"
-              className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
-            >
-              Sign in
-            </button>
+        )}
+        <form onSubmit={handleSubmit}>
+          <div className="mb-4">
+            <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="email">
+              Email
+            </label>
+            <input
+              type="email"
+              id="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+              required
+            />
           </div>
+          <div className="mb-6">
+            <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="password">
+              Password
+            </label>
+            <input
+              type="password"
+              id="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 mb-3 leading-tight focus:outline-none focus:shadow-outline"
+              required
+            />
+          </div>
+          <button
+            type="submit"
+            className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline w-full"
+          >
+            Sign In
+          </button>
         </form>
       </div>
     </div>
@@ -288,39 +82,270 @@ const Login = () => {
 };
 
 // Access Denied Component
-const AccessDenied = () => (
-  <div className="min-h-screen flex items-center justify-center bg-gray-100 px-4 sm:px-6 lg:px-8">
-    <div className="max-w-md w-full text-center">
-      <AlertCircle className="mx-auto h-12 w-12 text-red-500" />
-      <h2 className="mt-6 text-3xl font-extrabold text-gray-900">Access Denied</h2>
-      <p className="mt-2 text-sm text-gray-600">
-        You don't have permission to access this page.
-      </p>
-      <div className="mt-6">
-        <a
-          href="/"
-          className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700"
+const AccessDenied = () => {
+  return (
+    <div className="min-h-screen flex items-center justify-center bg-gray-100">
+      <div className="bg-white p-8 rounded-xl shadow-md w-96 text-center">
+        <AlertCircle className="mx-auto mb-4 text-red-500" size={64} />
+        <h2 className="text-2xl font-bold mb-4">Access Denied</h2>
+        <p className="text-gray-600 mb-6">You do not have permission to access this page.</p>
+        <Link 
+          to="/" 
+          className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
         >
-          Return to Dashboard
-        </a>
+          Go Back
+        </Link>
       </div>
     </div>
-  </div>
-);
-
-// Main App Component
-const App = () => {
-  const [isAuthenticated] = useState(true); // Replace with your auth logic
-
-  if (!isAuthenticated) {
-    return <Login />;
-  }
-
-  return (
-    <DashboardLayout>
-      <Dashboard />
-    </DashboardLayout>
   );
 };
 
-export default App;
+// Dashboard Component
+const Dashboard = () => {
+  return (
+    <div className="p-6">
+      <h1 className="text-3xl font-bold mb-6">Dashboard Overview</h1>
+      
+      {/* Stats Cards */}
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-6">
+        <div className="bg-white p-6 rounded-xl shadow-md">
+          <h3 className="text-gray-500 mb-2">Total Cases</h3>
+          <p className="text-2xl font-bold">1,254</p>
+        </div>
+        <div className="bg-white p-6 rounded-xl shadow-md">
+          <h3 className="text-gray-500 mb-2">Open Cases</h3>
+          <p className="text-2xl font-bold">342</p>
+        </div>
+        <div className="bg-white p-6 rounded-xl shadow-md">
+          <h3 className="text-gray-500 mb-2">Closed Cases</h3>
+          <p className="text-2xl font-bold">912</p>
+        </div>
+        <div className="bg-white p-6 rounded-xl shadow-md">
+          <h3 className="text-gray-500 mb-2">Pending Cases</h3>
+          <p className="text-2xl font-bold">56</p>
+        </div>
+      </div>
+
+      {/* Recent Activity Table */}
+      <div className="bg-white p-6 rounded-xl shadow-md">
+        <h2 className="text-xl font-bold mb-4">Recent Activity</h2>
+        <table className="w-full">
+          <thead>
+            <tr className="bg-gray-100">
+              <th className="p-3 text-left">Case ID</th>
+              <th className="p-3 text-left">Description</th>
+              <th className="p-3 text-left">Status</th>
+              <th className="p-3 text-left">Date</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr className="border-b">
+              <td className="p-3">CASE-001</td>
+              <td className="p-3">Quarterly Review</td>
+              <td className="p-3">
+                <span className="bg-green-100 text-green-800 px-2 py-1 rounded-full">Completed</span>
+              </td>
+              <td className="p-3">2024-02-05</td>
+            </tr>
+            <tr className="border-b">
+              <td className="p-3">CASE-002</td>
+              <td className="p-3">Performance Audit</td>
+              <td className="p-3">
+                <span className="bg-yellow-100 text-yellow-800 px-2 py-1 rounded-full">In Progress</span>
+              </td>
+              <td className="p-3">2024-02-07</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  );
+};
+
+// Case Overview Component
+const CaseOverview = () => {
+  const [cases, setCases] = useState([
+    { id: 'CASE-001', title: 'Quarterly Review', status: 'Completed', assignee: 'John Doe' },
+    { id: 'CASE-002', title: 'Performance Audit', status: 'In Progress', assignee: 'Jane Smith' },
+    { id: 'CASE-003', title: 'Compliance Check', status: 'Pending', assignee: 'Mike Johnson' }
+  ]);
+
+  return (
+    <div className="p-6">
+      <h1 className="text-3xl font-bold mb-6">Case Overview</h1>
+      
+      <div className="bg-white p-6 rounded-xl shadow-md">
+        <table className="w-full">
+          <thead>
+            <tr className="bg-gray-100">
+              <th className="p-3 text-left">Case ID</th>
+              <th className="p-3 text-left">Title</th>
+              <th className="p-3 text-left">Status</th>
+              <th className="p-3 text-left">Assignee</th>
+            </tr>
+          </thead>
+          <tbody>
+            {cases.map((caseItem) => (
+              <tr key={caseItem.id} className="border-b">
+                <td className="p-3">{caseItem.id}</td>
+                <td className="p-3">{caseItem.title}</td>
+                <td className="p-3">
+                  <span className={`
+                    px-2 py-1 rounded-full 
+                    ${caseItem.status === 'Completed' ? 'bg-green-100 text-green-800' : 
+                      caseItem.status === 'In Progress' ? 'bg-yellow-100 text-yellow-800' : 
+                      'bg-gray-100 text-gray-800'}
+                  `}>
+                    {caseItem.status}
+                  </span>
+                </td>
+                <td className="p-3">{caseItem.assignee}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  );
+};
+
+// Champions Component
+const Champions = () => {
+  const [champions, setChampions] = useState([
+    { id: 1, name: 'Emma Wilson', role: 'Top Performer', cases: 45, rating: 9.5 },
+    { id: 2, name: 'Alex Rodriguez', role: 'Senior Analyst', cases: 38, rating: 9.2 },
+    { id: 3, name: 'Sarah Lee', role: 'Team Lead', cases: 52, rating: 9.7 }
+  ]);
+
+  return (
+    <div className="p-6">
+      <h1 className="text-3xl font-bold mb-6">Champions</h1>
+      
+      <div className="bg-white p-6 rounded-xl shadow-md">
+        <table className="w-full">
+          <thead>
+            <tr className="bg-gray-100">
+              <th className="p-3 text-left">Name</th>
+              <th className="p-3 text-left">Role</th>
+              <th className="p-3 text-left">Cases Handled</th>
+              <th className="p-3 text-left">Performance Rating</th>
+            </tr>
+          </thead>
+          <tbody>
+            {champions.map((champion) => (
+              <tr key={champion.id} className="border-b">
+                <td className="p-3">{champion.name}</td>
+                <td className="p-3">{champion.role}</td>
+                <td className="p-3">{champion.cases}</td>
+                <td className="p-3">
+                  <span className={`
+                    px-2 py-1 rounded-full 
+                    ${champion.rating >= 9.5 ? 'bg-green-100 text-green-800' : 
+                      champion.rating >= 9.0 ? 'bg-yellow-100 text-yellow-800' : 
+                      'bg-gray-100 text-gray-800'}
+                  `}>
+                    {champion.rating}
+                  </span>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  );
+};
+
+// Sidebar Component
+const Sidebar = ({ isOpen, onClose }) => {
+  const [activeMenu, setActiveMenu] = useState('dashboard');
+
+  return (
+    <div className={`
+      fixed inset-y-0 left-0 transform ${isOpen ? 'translate-x-0' : '-translate-x-full'} 
+      w-64 bg-gray-800 text-white transition-transform duration-300 ease-in-out z-50 md:relative md:translate-x-0
+    `}>
+      <div className="flex items-center justify-between p-4 border-b border-gray-700">
+        <h1 className="text-2xl font-bold">Bolt Dashboard</h1>
+        <button 
+          onClick={onClose} 
+          className="md:hidden focus:outline-none"
+        >
+          ✕
+        </button>
+      </div>
+      <nav className="mt-6">
+        <Link 
+          to="/dashboard" 
+          className={`
+            flex items-center p-4 hover:bg-gray-700 
+            ${activeMenu === 'dashboard' ? 'bg-gray-700' : ''}
+          `}
+          onClick={() => setActiveMenu('dashboard')}
+        >
+          <LayoutDashboard className="mr-3" />
+          Dashboard
+        </Link>
+        <Link 
+          to="/case-overview" 
+          className={`
+            flex items-center p-4 hover:bg-gray-700 
+            ${activeMenu === 'cases' ? 'bg-gray-700' : ''}
+          `}
+          onClick={() => setActiveMenu('cases')}
+        >
+          <FileText className="mr-3" />
+          Case Overview
+        </Link>
+        <Link 
+          to="/champions" 
+          className={`
+            flex items-center p-4 hover:bg-gray-700 
+            ${activeMenu === 'champions' ? 'bg-gray-700' : ''}
+          `}
+          onClick={() => setActiveMenu('champions')}
+        >
+          <Users className="mr-3" />
+          Champions
+        </Link>
+        <div className="absolute bottom-0 w-full">
+          <button 
+            onClick={() => {
+              localStorage.removeItem('isAuthenticated');
+              window.location.href = '/';
+            }}
+            className="flex items-center p-4 hover:bg-gray-700 w-full"
+          >
+            <LogOut className="mr-3" />
+            Logout
+          </button>
+        </div>
+      </nav>
+    </div>
+  );
+};
+
+// Dashboard Layout Component
+const DashboardLayout = ({ children }) => {
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+
+  const toggleSidebar = () => {
+    setIsSidebarOpen(!isSidebarOpen);
+  };
+
+  return (
+    <div className="flex h-screen bg-gray-100">
+      <Sidebar isOpen={isSidebarOpen} onClose={toggleSidebar} />
+      
+      <div className="flex-1 overflow-y-auto">
+        {/* Mobile Header */}
+        <div className="md:hidden flex items-center p-4 bg-white shadow-md">
+          <button onClick={toggleSidebar} className="mr-4">
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+            </svg>
+          </button>
+          <h1 className="text-xl font-bold">Bolt Dashboard</h1>
+        </div>
+        
+        {children
